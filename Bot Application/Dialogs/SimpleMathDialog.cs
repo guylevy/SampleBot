@@ -26,6 +26,21 @@ namespace Bot_Application.Dialogs
             }
         }
 
+        private double Subtract(LuisResult result)
+        {
+            var subtractFrom = result.Entities.Where(entity => entity.Type == "StartNumber").FirstOrDefault();
+            var numbers = result.Entities.Where(entity => entity.Type == "builtin.number" && ! (entity.StartIndex == subtractFrom.StartIndex && entity.EndIndex == subtractFrom.EndIndex)).Select(entity => { Double.TryParse(entity.Entity, out double entityAsDouble); return entityAsDouble; });
+
+            if (subtractFrom != null && double.TryParse(subtractFrom.Entity, out double number))
+            {                
+                return number - numbers.Sum();
+            }
+            else
+            {
+                return 0.0 - numbers.Sum();                
+            }
+        }
+
         [LuisIntent("")]
         public async Task None(IDialogContext context, LuisResult result)
         {
@@ -39,7 +54,7 @@ namespace Bot_Application.Dialogs
         {
             if (TryFindNumbers(result, out IEnumerable<double> numbersToSum))
             {
-                string reply = string.Format("sum is {0}", numbersToSum.Sum());
+                string reply = $"sum is {numbersToSum.Sum()}";
                 await context.PostAsync(reply);
             }
             else
@@ -48,7 +63,41 @@ namespace Bot_Application.Dialogs
             }
             context.Wait(MessageReceived);
         }
-      
+
+        [LuisIntent("subtract numbers")]
+        public async Task Subtract(IDialogContext context, LuisResult result)
+        {
+            string reply;
+            reply = ComputeSubtractReply(result);
+
+            await context.PostAsync(reply);
+            context.Wait(MessageReceived);
+        }
+
+        private static string ComputeSubtractReply(LuisResult result)
+        {
+            string reply;
+            var subtractFrom = result.Entities.Where(entity => entity.Type == "StartNumber").FirstOrDefault();
+            var numbers = result.Entities.Where(entity => entity.Type == "builtin.number" && !(entity.StartIndex == subtractFrom.StartIndex && entity.EndIndex == subtractFrom.EndIndex)).Select(entity => { Double.TryParse(entity.Entity, out double entityAsDouble); return entityAsDouble; });
+
+            if (subtractFrom != null && double.TryParse(subtractFrom.Entity, out double number))
+            {
+
+                string equation = $"{number}";
+                foreach (double n in numbers)
+                {
+                    equation += $"- {n}";
+                }                
+                reply = $"{equation} =  {number - numbers.Sum()}";
+            }
+            else
+            {
+                reply = $"Could not find number to substarct from, using 0.0 instead... {0.0} {numbers.Select(n => "-" + n)} =  is {0.0 - numbers.Sum()}";
+            }
+
+            return reply;
+        }
+
         public SimpleMathDialog()
         {
         }
