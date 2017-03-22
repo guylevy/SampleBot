@@ -1,0 +1,5 @@
+samplebotapplicationguy.scm.azurewebsites.net:443
+SampleBotApplicationGuy
+$SampleBotApplicationGuy
+http://samplebotapplicationguy.azurewebsites.net
+
