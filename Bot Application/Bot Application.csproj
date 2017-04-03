@@ -127,6 +127,7 @@
     <Compile Include="BotFrameworkHelpers\EntityRecognizer.cs" />
     <Compile Include="Controllers\MessagesController.cs" />
     <Compile Include="Dialogs\EchoDialog.cs" />
+    <Compile Include="Dialogs\MathForKidsDialog.cs" />
     <Compile Include="Dialogs\SimpleMathDialog.cs" />
     <Compile Include="Dialogs\SimpleAlarmDialog.cs" />
     <Compile Include="Global.asax.cs">
